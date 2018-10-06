@@ -49,7 +49,16 @@
                 die("Falha de conexão: " .  $conn->connect_error);
             }
 
-            // Tratar dados enviados para a página
+            // Tratar dados enviados via GET para excluir registro
+            if($_GET["id"]!=""){
+                $sql = "DELETE FROM tickets WHERE id = ".$_GET["id"];
+                if($conn->query($sql)===TRUE){
+                    echo "Registro excluído com sucesso!";
+                }
+
+            }
+
+            // Tratar dados enviados via POST para incluir registro
             if($_POST["titulo"] != ""){
                 $sql = "INSERT INTO tickets (titulo, status) VALUES ('".utf8_encode($_POST["titulo"])."', 0)";
                 if($conn->query($sql)===TRUE){
@@ -59,7 +68,6 @@
                 }
 
             }
-
 
             // recuperar todos os registros da tabela tickets
             $sql = "SELECT * FROM tickets";
@@ -76,6 +84,7 @@
                             <th>ID</th>
                             <th>Título</th>
                             <th>Status</th>
+                            <th>&nbsp;</th>
                         </tr>
                     <?php
                         while($row = $result->fetch_assoc()){
@@ -89,6 +98,11 @@
                             }else{
                                 echo "Fechado";
                             }
+                            ?>
+                            <td>
+                            <a href="index.php?id=<?=$row["id"]?>">APAGAR</a>
+                            </td>
+                            <?php
                             echo "</td>";
                             echo "</tr>";
 
