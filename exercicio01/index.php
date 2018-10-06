@@ -2,7 +2,7 @@
 
 <head>
     <meta charset="utf-8" />
-    <title>Cadastro de usuários</title>
+    <title>Cadastro de usuÃ¡rios</title>
     <style>
         table, td, th {
             border: 1px solid black;
@@ -23,8 +23,8 @@
     </style>
 </head>
 <body>
-    <!-- formulário de cadastro de usuário -->
-    <h2>Cadastro de usuário</h2>
+    <!-- formulÃ¡rio de cadastro de usuÃ¡rio -->
+    <h2>Cadastro de usuÃ¡rio</h2>
 
     <table>
         <tr>
@@ -58,7 +58,7 @@
         </tr>
 
     </table>
-    <!-- Lista de usuário -->
+    <!-- Lista de usuÃ¡rio -->
     <table>
         <tr>
             <h2>Usuarios</h2>
@@ -67,13 +67,14 @@
             <td>Nome de acesso</td>
             <td>Senha</td>
             <td>Status</td>
-            <td></td>
+            <td>Editar</td>
+            <th>Desativar</th>
         </tr>
     </table>
 
-    <!-- Edição de usuário -->
+    <!-- EdiÃ§Ã£o de usuÃ¡rio -->
     <table>
-        <h2> Editar usuário</h2>
+        <h2> Editar usuÃ¡rio</h2>
         <tr>
             <td>
                 <label>Nome Completo: </label>
