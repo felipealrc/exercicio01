@@ -26,6 +26,7 @@
     <!-- formulário de cadastro de usuário -->
     <h2>Cadastro de usuário</h2>
 
+<form action = "index.php" method = "post">
     <table>
         <tr>
             <td>
@@ -58,6 +59,34 @@
         </tr>
 
     </table>
+</form>    
+
+    <?php
+            $servidor="projfc_db_1";
+            $usuario="root";
+            $senha="phprs";
+            $banco="tickets";
+
+            $conn= new mysqli ($servidor, $usuario,$senha,$banco);
+
+        if($conn->connect_error){
+            die("Falha de conexão: " . $conn->connect_error);
+        }    
+
+        if(($_POST["nome"] != "")&& ($_POST["login"] != "")&&($_POST["senha"] != "")){
+            $sql = "INSERT INTO `usuario`(`nome`,`login`,`senha`,`status`) VALUES ('".($_POST ["nome"])."','".($_POST ["login"])."','".($_POST ["senha"])."',0)";
+            if($conn->query($sql)===TRUE){
+                echo"Usuário Cadastrado!";
+            }else{
+                echo"ocorreu um erro: " .$sql. "<br/>".$conn->error;
+            }
+
+        }
+
+
+    ?>   
+
+
     <!-- Lista de usuário -->
     <table>
         <tr>
