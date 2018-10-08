@@ -23,6 +23,8 @@
     </style>
 </head>
 <body>
+
+
     <!-- formulário de cadastro de usuário -->
     <h2>Cadastro de usuário</h2>
 
@@ -72,6 +74,10 @@
         if($conn->connect_error){
             die("Falha de conexão: " . $conn->connect_error);
         }    
+
+       
+        
+
         // Função de DESATIVAR usuário
         if(($_GET["id"]!="") && (isset($_GET["status"]))){
             $sql = "UPDATE `usuario` SET `status` = ".($_GET["status"]== 1? "0" : "1")." WHERE `usuario`.`id` = ".$_GET["id"];
@@ -83,7 +89,11 @@
         }
 
         if(($_POST["nome"] != "")&& ($_POST["login"] != "")&&($_POST["senha"] != "")){
-            $sql = "INSERT INTO `usuario`(`nome`,`login`,`senha`,`status`) VALUES ('".($_POST ["nome"])."','".($_POST ["login"])."','".($_POST ["senha"])."',0)";
+         //cripto senha
+        
+        $criptografada = md5($_POST["senha"]);
+       
+            $sql = "INSERT INTO `usuario`(`nome`,`login`,`senha`,`status`) VALUES ('".($_POST ["nome"])."','".($_POST ["login"])."','".$criptografada."',0)";
             if($conn->query($sql)===TRUE){
                 echo"Usuário Cadastrado!";
             }else{
