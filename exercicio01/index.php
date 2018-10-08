@@ -48,7 +48,7 @@
             <td>
 
                 <label>Senha</label>
-                <input type="text" name="senha" />
+                <input type="password" name="senha" />
 
             </td>
         </tr>
@@ -88,9 +88,14 @@
             }    
         }
 
-        if(($_POST["nome"] != "")&& ($_POST["login"] != "")&&($_POST["senha"] != "")){
+        if($_POST["id"] != ''){
+            $criptografada = md5($_POST["senha_editar"]);
+            $sql = "UPDATE usuario SET senha ='".$criptografada."' WHERE id = ".$_POST["id"];
+            if($conn->query($sql)===TRUE)
+                echo "<script>alert('senha alterada com sucesso')</script>";
+        }            
+        else if(($_POST["nome"] != "")&& ($_POST["login"] != "")&&($_POST["senha"] != "")){
          //cripto senha
-        
         $criptografada = md5($_POST["senha"]);
        
             $sql = "INSERT INTO `usuario`(`nome`,`login`,`senha`,`status`) VALUES ('".($_POST ["nome"])."','".($_POST ["login"])."','".$criptografada."',0)";
@@ -118,10 +123,11 @@
             <tr>
                 <th>ID</th>
                 <th>Nome completo</th>
-                <th>E-mail</th>
+                <th>Login</th>
                 <th>Senha</th>
                 <th>Status</th>
                 <th>Desativar</th>
+                <th> editar </th>
             </tr> 
         <?php
             while($row = $result->fetch_assoc()){
@@ -131,7 +137,14 @@
                 echo "<td>". utf8_decode($row["login"])."</td>";
                 echo "<td>". utf8_decode($row["senha"])."</td>";
                 echo "<td>".($row["status"]=='0'? "Desativado":"Ativo")."</td>";
-                echo "<td><a href='index.php?id={$row["id"]}&status={$row["status"]}'>".($row["status"]=='0'? "Ativar":"Desativar")."</a></td>";
+                $code = "<td>
+                            <a href='index.php?id=".$row["id"]."&status=".$row["status"]."'>".
+                                ($row["status"]=='0'? "Desativar":"Ativar")."
+                            </a> 
+                        </td>";
+                echo $code;
+                    echo "<td><a href='index.php?id={$row["id"]}&edit=1'>editar</a></td>";
+                echo "</tr>";
             }
         ?>
         </table>
@@ -139,23 +152,33 @@
             }else{
                 echo "Nenhum registro";
             }
-            $conn->close();
+            #$conn->close();
         ?>
 
 
     <!-- Edição de usuário -->
+    <?php
+    if($_GET['edit']==1){
+        $sql = "SELECT * FROM usuario where id = {$_GET['id']}";
+        $result = $conn->query($sql);
+        $user = $result->fetch_assoc();
+        
+
+        ?>
+    <form action = "index.php" method = "post">
     <table>
         <h2> Editar usuário</h2>
         <tr>
             <td>
+                <input value=<?echo $user['id']?> name='id' style="display:none"/>
                 <label>Nome Completo: </label>
-                <label>Franciele Castilho</label>
+                <label><?echo $user['nome'];?></label>
             </td>
         </tr>
         <tr>
             <td>
-                <label>E-mail: </label>
-                <label>francielecasteves@gmail.com</label>
+                <label>Login: </label>
+                <label><?echo $user['login'];?></label>
             </td>
         </tr>
 
@@ -163,18 +186,20 @@
             <td>
 
                 <label>Senha</label>
-                <input type="text" name="senha_editar" />
+                <input type="password" name="senha_editar" />
 
             </td>
         </tr>
 
         <tr>
             <td>
-
                 <input type="submit" name="botao_editar" value="Salvar" />
             </td>
         </tr>
     </table>
-
+    </form>
+    <?php
+    }
+    ?>
 </body>
 </html>
