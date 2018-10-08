@@ -62,7 +62,7 @@
 </form>    
 
     <?php
-            $servidor="projfc_db_1";
+            $servidor="cursophp_db_1";
             $usuario="root";
             $senha="phprs";
             $banco="tickets";
@@ -72,6 +72,15 @@
         if($conn->connect_error){
             die("Falha de conexão: " . $conn->connect_error);
         }    
+        // Função de DESATIVAR usuário
+        if(($_GET["id"]!="") && (isset($_GET["status"]))){
+            $sql = "UPDATE `usuario` SET `status` = ".($_GET["status"]== 1? "0" : "1")." WHERE `usuario`.`id` = ".$_GET["id"];
+            if($conn->query($sql)===TRUE){
+                echo "Status alterado com sucesso!";
+            }else{
+                echo "Ocorreu um erro" .$sql. "<br/>".$conn->error;
+            }    
+        }
 
         if(($_POST["nome"] != "")&& ($_POST["login"] != "")&&($_POST["senha"] != "")){
             $sql = "INSERT INTO `usuario`(`nome`,`login`,`senha`,`status`) VALUES ('".($_POST ["nome"])."','".($_POST ["login"])."','".($_POST ["senha"])."',0)";
@@ -87,19 +96,42 @@
     ?>   
 
 
-    <!-- Lista de usuário -->
-    <table>
-        <tr>
-            <h2>Usuarios</h2>
-            <td>ID</td>
-            <td>Nome completo</td>
-            <td>Nome de acesso</td>
-            <td>Senha</td>
-            <td>Status</td>
-            <td>Editar</td>
-            <th>Desativar</th>
-        </tr>
-    </table>
+   <!-- Lista de usuário -->
+    <?php
+        //Função LISTAR usuário
+        $sql = "SELECT * FROM `usuario`";
+        $result = $conn->query($sql);
+        if($result->num_rows > 0){
+    ?>
+        <h2>Usuarios</h2>
+        <table>
+            <tr>
+                <th>ID</th>
+                <th>Nome completo</th>
+                <th>E-mail</th>
+                <th>Senha</th>
+                <th>Status</th>
+                <th>Desativar</th>
+            </tr> 
+        <?php
+            while($row = $result->fetch_assoc()){
+                echo "<tr>";
+                echo "<td>". $row["id"]."</td>";
+                echo "<td>". utf8_decode($row["nome"])."</td>";
+                echo "<td>". utf8_decode($row["login"])."</td>";
+                echo "<td>". utf8_decode($row["senha"])."</td>";
+                echo "<td>".($row["status"]=='0'? "Desativado":"Ativo")."</td>";
+                echo "<td><a href='index.php?id={$row["id"]}&status={$row["status"]}'>".($row["status"]=='0'? "Ativar":"Desativar")."</a></td>";
+            }
+        ?>
+        </table>
+        <?php
+            }else{
+                echo "Nenhum registro";
+            }
+            $conn->close();
+        ?>
+
 
     <!-- Edição de usuário -->
     <table>
