@@ -139,7 +139,7 @@
                 echo "<td>".($row["status"]=='0'? "Desativado":"Ativo")."</td>";
                 $code = "<td>
                             <a href='index.php?id=".$row["id"]."&status=".$row["status"]."'>".
-                                ($row["status"]=='0'? "Desativar":"Ativar")."
+                                ($row["status"]=='1'? "Desativar":"Ativar")."
                             </a> 
                         </td>";
                 echo $code;
