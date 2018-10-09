@@ -13,6 +13,9 @@
             padding: 10px;
             
         }
+        
+
+       
 
         tr:nth-child(odd) {
             background-color: white;
@@ -20,6 +23,8 @@
     </style>
 </head>
 <body>
+
+
     <!-- formulário de cadastro de usuário -->
     <h2>Cadastro de usuário</h2>
 
@@ -68,27 +73,32 @@
 
         if($conn->connect_error){
             die("Falha de conexão: " . $conn->connect_error);
-        }
-
-
-        // Função de DESATIVAR usuário
-            if(($_GET["id"]!="") & ($_GET["status"] != "0")){
-             $sql = "UPDATE `usuario` SET `status` = '1' WHERE `usuario`.`id` = ".$_GET["id"];
-                if($conn->query($sql)===TRUE){
-                echo "Status alterado com sucesso!";
-                }else{
-                echo "Ocorreu um erro" .$sql. "<br/>".$conn->error;
-                     }
-
-            }
-
+        }    
 
        
-
         
-        //Função CADASTRAR usuário
-        if(($_POST["nome"] != "")&& ($_POST["login"] != "")&&($_POST["senha"] != "")){
-            $sql = "INSERT INTO `usuario`(`nome`,`login`,`senha`,`status`) VALUES ('".($_POST ["nome"])."','".($_POST ["login"])."','".($_POST ["senha"])."',0)";
+
+        // Função de DESATIVAR usuário
+        if(($_GET["id"]!="") && (isset($_GET["status"]))){
+            $sql = "UPDATE `usuario` SET `status` = ".($_GET["status"]== 1? "0" : "1")." WHERE `usuario`.`id` = ".$_GET["id"];
+            if($conn->query($sql)===TRUE){
+                echo "Status alterado com sucesso!";
+            }else{
+                echo "Ocorreu um erro" .$sql. "<br/>".$conn->error;
+            }    
+        }
+
+        if($_POST["id"] != ''){
+            $criptografada = md5($_POST["senha_editar"]);
+            $sql = "UPDATE usuario SET senha ='".$criptografada."' WHERE id = ".$_POST["id"];
+            if($conn->query($sql)===TRUE)
+                echo "<script>alert('senha alterada com sucesso')</script>";
+        }            
+        else if(($_POST["nome"] != "")&& ($_POST["login"] != "")&&($_POST["senha"] != "")){
+         //cripto senha
+        $criptografada = md5($_POST["senha"]);
+       
+            $sql = "INSERT INTO `usuario`(`nome`,`login`,`senha`,`status`) VALUES ('".($_POST ["nome"])."','".($_POST ["login"])."','".$criptografada."',0)";
             if($conn->query($sql)===TRUE){
                 echo"Usuário Cadastrado!";
             }else{
@@ -97,73 +107,78 @@
 
         }
 
-        
+
     ?>   
 
-    <!-- Lista de usuário -->
+
+   <!-- Lista de usuário -->
     <?php
-    //Função LISTAR usuário
+        //Função LISTAR usuário
         $sql = "SELECT * FROM `usuario`";
         $result = $conn->query($sql);
-                    if($result->num_rows > 0){
-                ?>
-    
-                        <table>
-                            <tr>
-                                <h2>Usuarios</h2>
-                                <th>ID</th>
-                                <th>Nome completo</th>
-                                <th>E-mail</th>
-                                <th>Senha</th>
-                                <th>Status</th>
-                                <th>Desativar</th>
-                            </tr> 
-                            <?php
-                                    while($row = $result->fetch_assoc()){
-                                        echo "<tr>";
-                                        echo "<td>". $row["id"]."</td>";
-                                        echo "<td>". utf8_decode($row["nome"])."</td>";
-                                        echo "<td>". utf8_decode($row["login"])."</td>";
-                                        echo "<td>". utf8_decode($row["senha"])."</td>";
-                                        echo "<td>";
-                                            if($row["status"]==0){
-                                                echo "Aberto";
-                                            }else{
-                                                    echo"Fechado";
-                                                }
-                                ?>
-                                                    
-                                                    <td>
-                                                    <a href="index.php?id=<?=$row["id"]?>">DESATIVAR</a>
-                                                    </td>
-                                        <?php
-                                        }
-                                        ?>
-                        </table>
-                     <?php
-                     }else{
-                        echo "Nenhum registro";
+        if($result->num_rows > 0){
+    ?>
+        <h2>Usuarios</h2>
+        <table>
+            <tr>
+                <th>ID</th>
+                <th>Nome completo</th>
+                <th>Login</th>
+                <th>Senha</th>
+                <th>Status</th>
+                <th>Desativar</th>
+                <th> editar </th>
+            </tr> 
+        <?php
+            while($row = $result->fetch_assoc()){
+                echo "<tr>";
+                echo "<td>". $row["id"]."</td>";
+                echo "<td>". utf8_decode($row["nome"])."</td>";
+                echo "<td>". utf8_decode($row["login"])."</td>";
+                echo "<td>". utf8_decode($row["senha"])."</td>";
+                echo "<td>".($row["status"]=='0'? "Desativado":"Ativo")."</td>";
+                $code = "<td>
+                            <a href='index.php?id=".$row["id"]."&status=".$row["status"]."'>".
+                                ($row["status"]=='1'? "Desativar":"Ativar")."
+                            </a> 
+                        </td>";
+                echo $code;
+                    echo "<td><a href='index.php?id={$row["id"]}&edit=1'>editar</a></td>";
+                echo "</tr>";
+            }
+        ?>
+        </table>
+        <?php
+            }else{
+                echo "Nenhum registro";
+            }
+            #$conn->close();
+        ?>
 
-                        
-                    }
-                        $conn->close();
-                        ?>
-                       
 
     <!-- Edição de usuário -->
-    <table>
+    <?php
+    if($_GET['edit']==1){
+        $sql = "SELECT * FROM usuario where id = {$_GET['id']}";
+        $result = $conn->query($sql);
+        $user = $result->fetch_assoc();
+        
 
+        ?>
+    <form action = "index.php" method = "post">
+    <table>
         <h2> Editar usuário</h2>
         <tr>
             <td>
+                <input value=<?echo $user['id']?> name='id' style="display:none"/>
                 <label>Nome Completo: </label>
-                <label>Franciele Castilho</label>
+                <label><?echo $user['nome'];?></label>
             </td>
         </tr>
         <tr>
             <td>
-                <label>E-mail: </label>
-                <label>francielecasteves@gmail.com</label>
+                <label>Login: </label>
+                <label><?echo $user['login'];?></label>
             </td>
         </tr>
 
@@ -178,11 +193,13 @@
 
         <tr>
             <td>
-
                 <input type="submit" name="botao_editar" value="Salvar" />
             </td>
         </tr>
     </table>
-
+    </form>
+    <?php
+    }
+    ?>
 </body>
 </html>
